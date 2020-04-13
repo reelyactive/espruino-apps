@@ -7,6 +7,7 @@
 // Constants
 const COUNT_DURATION_SECONDS = 30;
 const CRITICAL_TIME_THRESHOLD = 10;
+const SCAN_TIMEOUT_MILLISECONDS = 10000;
 const TARGET_RSSI = -50;
 const MIN_RSSI = -99;
 const APP_TITLE = 'Egg Hunt';
@@ -24,6 +25,7 @@ const CRITICAL_TIMER_MAGNIFICATION = 8;
 let eggSize;
 let count;
 let countInterval;
+let initialScanTimeout;
 let timerColor;
 let timerMagnification;
 
@@ -72,6 +74,9 @@ function startHunt(manufacturer) {
   if(manufacturer === 0x004c) {                      //   can we make this
     filter = { manufacturerData: { 0x004c: {} } };   //   dynamic in future?
   }
+
+  initialScanTimeout = setTimeout(handleInitialScanTimeout,
+                                  SCAN_TIMEOUT_MILLISECONDS);
   
   NRF.setScan(function(device) {
     handleInitialDeviceDetection(device);
@@ -80,10 +85,24 @@ function startHunt(manufacturer) {
 
 
 /**
+ * Handle the case where no Espruino/Apple device detected.
+ */
+function handleInitialScanTimeout() {
+  NRF.setScan();
+
+  E.showAlert('SCAN TIMEOUT\nNo such device...', APP_TITLE).then(function() {
+    egghunt();
+  });
+}
+
+
+/**
  * Update scan to filter only the given device ID, and begin countdown.
  * @param {Object} device The device detected by the scan.
  */
 function handleInitialDeviceDetection(device) {
+  clearTimeout(initialScanTimeout);
+
   NRF.setScan(function(device) {
     handleDeviceUpdate(device);
   }, { filters: [ { id: device.id } ] });
