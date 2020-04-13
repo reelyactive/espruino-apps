@@ -17,7 +17,7 @@ App Descriptions
 
 ### Egg Hunt (egghunt.js)
 
-Program the Bangle.js to hunt for BLE "eggs" which grow in size the closer they get.  The Puck.js can be programmed to act as an Espruino "egg" which can be switched on/off with a button press.
+Program the Bangle.js to hunt for BLE "eggs" which grow in size the closer they get.  The Puck.js can be programmed to act as an Espruino "egg" which can be switched on/off with a button press.  [Video](https://www.youtube.com/watch?v=oUIwdN5F4yI)
 
 
 License
