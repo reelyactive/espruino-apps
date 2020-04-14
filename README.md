@@ -19,6 +19,10 @@ App Descriptions
 
 Program the Bangle.js to hunt for BLE "eggs" which grow in size the closer they get.  The Puck.js can be programmed to act as an Espruino "egg" which can be switched on/off with a button press.  [Video](https://www.youtube.com/watch?v=oUIwdN5F4yI)
 
+### Contact Tracing (contacttracing.js)
+
+Program the Puck.js to simulate the Contact Tracing service collaboration between Apple and Google ([see specifications](https://www.apple.com/covid19/contacttracing/)) in response to the COVID-19 pandemic.  The Puck.js will transmit a rolling proximity identifier which changes (randomly) every 15 minutes, and can be switched on/off with a button press.
+
 
 License
 -------
