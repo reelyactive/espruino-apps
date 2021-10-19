@@ -15,6 +15,10 @@ Devices can be programmed via the [Espruino IDE](https://www.espruino.com/ide/),
 App Descriptions
 ----------------
 
+### Emojuino (emojuino.js)
+
+Program the BBC micro:bit v2 to allow the user to select and transmit an emoji (or any Unicode character) via Bluetooth Low Energy as an InteroperaBLE Identifier (additional documentation to come).
+
 ### Egg Hunt (egghunt.js)
 
 Program the Bangle.js to hunt for BLE "eggs" which grow in size the closer they get.  The Puck.js can be programmed to act as an Espruino "egg" which can be switched on/off with a button press.  [Video](https://www.youtube.com/watch?v=oUIwdN5F4yI)
