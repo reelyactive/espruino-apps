@@ -17,7 +17,7 @@ App Descriptions
 
 ### Emojuino (emojuino.js)
 
-Program the Bangle.js v2 or BBC micro:bit v2 to allow the user to select and transmit an emoji (or any Unicode character) via Bluetooth Low Energy as an [InteroperaBLE Identifier](https://reelyactive.github.io/interoperable-identifier/).
+Program the Bangle.js v2 or BBC micro:bit v2 to allow the user to select and transmit an emoji (or any Unicode character) via Bluetooth Low Energy as an [InteroperaBLE Identifier](https://reelyactive.github.io/interoperable-identifier/).  Available via the [Bangle.js app loader](https://banglejs.com/apps/#emojuino), where the latest version is maintained.
 
 ### Knob.js (knob-button.js)
 
