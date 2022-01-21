@@ -8,8 +8,8 @@ Programming Espruino Devices
 ----------------------------
 
 Devices can be programmed via the [Espruino IDE](https://www.espruino.com/ide/), which uses Web Bluetooth.  Simply open in the IDE the file from the corresponding device's folder in this repository and program the device.  Consult our tutorials for step-by-step instructions:
-- [Develop BLE applications with Puck.js](https://reelyactive.github.io/diy/puckjs-dev/)
-- [Develop BLE applications with Bangle.js](https://reelyactive.github.io/diy/banglejs-dev/)
+- [Puck.js Development Guide](https://reelyactive.github.io/diy/puckjs-dev/)
+- [Bangle.js Development Guide](https://reelyactive.github.io/diy/banglejs-dev/)
 
 
 App Descriptions
