@@ -1,7 +1,7 @@
 Espruino Apps
 =============
 
-Open source software applications for [Espruino](https://www.espruino.com/) devices such as Puck.js and Bangle.js.
+Open source software applications for [Espruino](https://www.espruino.com/) devices such as Puck.js, Bangle.js and Jolt.js.
 
 
 Programming Espruino Devices
@@ -10,6 +10,7 @@ Programming Espruino Devices
 Devices can be programmed via the [Espruino IDE](https://www.espruino.com/ide/), which uses Web Bluetooth.  Simply open in the IDE the file from the corresponding device's folder in this repository and program the device.  Consult our tutorials for step-by-step instructions:
 - [Puck.js Development Guide](https://reelyactive.github.io/diy/puckjs-dev/)
 - [Bangle.js Development Guide](https://reelyactive.github.io/diy/banglejs-dev/)
+- [Jolt.js Development Guide](https://reelyactive.github.io/diy/joltjs-dev/)
 
 
 App Descriptions
