@@ -24,6 +24,10 @@ Program the Bangle.js v2 or BBC micro:bit v2 to allow the user to select and tra
 
 Program the Puck.js v2 to advertise its angle of rotation, like a knob, following a button press.  Works best in the vertical plane (as it uses accelerometer data, rotation angle estimation is not possible in the horizontal plane).  [Load in Espruino IDE](https://www.espruino.com/ide/?codeurl=https://raw.githubusercontent.com/reelyactive/espruino-apps/master/puckjs-v2/knob-button.js)
 
+### Temp.js (temperature.js)
+
+Program the Puck.js v2 to periodically advertise its temperature and battery level, with on demand readings triggered by a button press.  [Load in Espruino IDE](https://www.espruino.com/ide/?codeurl=https://raw.githubusercontent.com/reelyactive/espruino-apps/master/puckjs-v2/temperature.js)
+
 ### 12-Year Anniversary Clock
 
 Program the Jolt.js as a physical clock with hour and minute hands, controlled by stepper motors.  [Load in Espruino IDE](https://www.espruino.com/ide/?codeurl=https://raw.githubusercontent.com/reelyactive/espruino-apps/master/joltjs/anniversary-clock.js)
