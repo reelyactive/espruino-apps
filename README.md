@@ -1,7 +1,7 @@
 Espruino Apps
 =============
 
-Open source software applications for [Espruino](https://www.espruino.com/) devices such as Puck.js, Bangle.js and Jolt.js.
+Open source software applications for [Espruino](https://www.espruino.com/) devices such as Puck.js, Bangle.js, Jolt.js and Pixl.js.
 
 
 Programming Espruino Devices
@@ -27,6 +27,10 @@ Program the Puck.js v2 to advertise its angle of rotation, like a knob, followin
 ### Temp.js (temperature.js)
 
 Program the Puck.js v2 to periodically advertise its temperature and battery level, with on demand readings triggered by a button press.  [Load in Espruino IDE](https://www.espruino.com/ide/?codeurl=https://raw.githubusercontent.com/reelyactive/espruino-apps/master/puckjs-v2/temperature.js)
+
+### IoCS Common (iocs-common.js)
+
+Program the Pixl.js to support Bluetooth GATT services and characteristics of the InteroperaBLE Characteristics & Services Common specification.  The LCD displays any characteristic values written by the host, for example using the [iocs-common Web Bluetooth app](https://reelyactive.github.io/gatt-interfaces/iocs-common/).  [Load in Espruino IDE](https://www.espruino.com/ide/?codeurl=https://raw.githubusercontent.com/reelyactive/espruino-apps/master/pixljs/iocs-common.js)
 
 ### 12-Year Anniversary Clock
 
