@@ -1,5 +1,5 @@
 /**
- * Copyright reelyActive 2025
+ * Copyright reelyActive 2025-2026
  * We believe in an open Internet of Things
  */
 
@@ -9,6 +9,8 @@ const DEFAULT_USE_PUBLIC_ADDRESS = false;
 const DEFAULT_DEVICE_NAME = "IoCS Common";
 const DEFAULT_SOFTWARE_REV = "1.0.0";
 const DEFAULT_ADV_INTERVAL_MILLISECONDS = 1000;
+const DEFAULT_BURST_DURATION_MILLISECONDS = 0;
+const DEFAULT_BURST_INTERVAL_MILLISECONDS = 0;
 const DEFAULT_ADV_TYPE = 1;
 const DEFAULT_ADV_FLAGS = 0x55;
 const DEFAULT_ADV_PARAMETER = 0;
@@ -21,7 +23,9 @@ const DEFAULT_ADV_PARAMETER = 0;
 let isPublicAddress = DEFAULT_USE_PUBLIC_ADDRESS;
 let advAddress = NRF.getAddress(true);
 let deviceName = DEFAULT_DEVICE_NAME;
-let adv1IntervalMilliseconds = DEFAULT_ADV_INTERVAL_MILLISECONDS;
+let adv1AdvertisingIntervalMilliseconds = DEFAULT_ADV_INTERVAL_MILLISECONDS;
+let adv1BurstDurationMilliseconds = DEFAULT_BURST_DURATION_MILLISECONDS;
+let adv1BurstIntervalMilliseconds = DEFAULT_BURST_INTERVAL_MILLISECONDS;
 let adv1Type = DEFAULT_ADV_TYPE;
 let adv1Flags = DEFAULT_ADV_FLAGS;
 let adv1Parameters = [ DEFAULT_ADV_PARAMETER, DEFAULT_ADV_PARAMETER,
@@ -51,11 +55,26 @@ function updateDeviceName(evt) {
   Terminal.println('deviceName: ' + deviceName);
 }
 
-// Update adv1IntervalMilliseconds following GATT write
-function updateAdv1Interval(evt) {
+// Update adv1AdvertisingIntervalMilliseconds following GATT write
+function updateAdv1AdvertisingInterval(evt) {
   let data = new Uint32Array(evt.data);
-  adv1IntervalMilliseconds = data[0];
-  Terminal.println('adv1Interval: ' + adv1IntervalMilliseconds);
+  adv1AdvertisingIntervalMilliseconds = data[0];
+  Terminal.println('adv1AdvertisingInterval: ' +
+                   adv1AdvertisingIntervalMilliseconds);
+}
+
+// Update adv1BurstDurationMilliseconds following GATT write
+function updateAdv1BurstDuration(evt) {
+  let data = new Uint32Array(evt.data);
+  adv1BurstDurationMilliseconds = data[0];
+  Terminal.println('adv1BurstDuration: ' + adv1BurstDurationMilliseconds);
+}
+
+// Update adv1BurstIntervalMilliseconds following GATT write
+function updateAdv1BurstInterval(evt) {
+  let data = new Uint32Array(evt.data);
+  adv1BurstIntervalMilliseconds = data[0];
+  Terminal.println('adv1BurstInterval: ' + adv1BurstIntervalMilliseconds);
 }
 
 // Update adv1Type following GATT write
@@ -127,19 +146,41 @@ NRF.setServices({
   // Service: IoCS Advertisement 1
   "4944a100-496f-4353-b73e-436f6d6d6f6e": {
 
-    // Characteristic: Interval (ms)
+    // Characteristic: Advertising Interval (ms)
     "4944a101-496f-4353-b73e-436f6d6d6f6e" : {
-      value: [ adv1IntervalMilliseconds & 0xff,
-               (adv1IntervalMilliseconds >> 8) & 0xff,
-               (adv1IntervalMilliseconds >> 16) & 0xff,
-               (adv1IntervalMilliseconds >> 24) & 0xff ],
+      value: [ adv1AdvertisingIntervalMilliseconds & 0xff,
+               (adv1AdvertisingIntervalMilliseconds >> 8) & 0xff,
+               (adv1AdvertisingIntervalMilliseconds >> 16) & 0xff,
+               (adv1AdvertisingIntervalMilliseconds >> 24) & 0xff ],
       readable: true,
       writable: true,
-      onWrite: updateAdv1Interval
+      onWrite: updateAdv1AdvertisingInterval
+    },
+
+    // Characteristic: Burst Duration (ms)
+    "4944a102-496f-4353-b73e-436f6d6d6f6e" : {
+      value: [ adv1BurstDurationMilliseconds & 0xff,
+               (adv1BurstDurationMilliseconds >> 8) & 0xff,
+               (adv1BurstDurationMilliseconds >> 16) & 0xff,
+               (adv1BurstDurationMilliseconds >> 24) & 0xff ],
+      readable: true,
+      writable: true,
+      onWrite: updateAdv1BurstDuration
+    },
+
+    // Characteristic: Burst Interval (ms)
+    "4944a103-496f-4353-b73e-436f6d6d6f6e" : {
+      value: [ adv1BurstIntervalMilliseconds & 0xff,
+               (adv1BurstIntervalMilliseconds >> 8) & 0xff,
+               (adv1BurstIntervalMilliseconds >> 16) & 0xff,
+               (adv1BurstIntervalMilliseconds >> 24) & 0xff ],
+      readable: true,
+      writable: true,
+      onWrite: updateAdv1BurstInterval
     },
 
     // Characteristic: Type
-    "4944a102-496f-4353-b73e-436f6d6d6f6e" : {
+    "4944a104-496f-4353-b73e-436f6d6d6f6e" : {
       value: adv1Type,
       readable: true,
       writable: true,
@@ -147,7 +188,7 @@ NRF.setServices({
     },
 
     // Characteristic: Flags
-    "4944a103-496f-4353-b73e-436f6d6d6f6e" : {
+    "4944a105-496f-4353-b73e-436f6d6d6f6e" : {
       value: adv1Flags,
       readable: true,
       writable: true,
@@ -155,7 +196,7 @@ NRF.setServices({
     },
 
     // Characteristic: Parameter 1
-    "4944a104-496f-4353-b73e-436f6d6d6f6e" : {
+    "4944a106-496f-4353-b73e-436f6d6d6f6e" : {
       value: [ adv1Parameters[0] & 0xff,
                (adv1Parameters[0] >> 8) & 0xff,
                (adv1Parameters[0] >> 16) & 0xff,
@@ -166,7 +207,7 @@ NRF.setServices({
     },
 
     // Characteristic: Parameter 2
-    "4944a105-496f-4353-b73e-436f6d6d6f6e" : {
+    "4944a107-496f-4353-b73e-436f6d6d6f6e" : {
       value: [ adv1Parameters[1] & 0xff,
                (adv1Parameters[1] >> 8) & 0xff,
                (adv1Parameters[1] >> 16) & 0xff,
@@ -177,7 +218,7 @@ NRF.setServices({
     },
 
     // Characteristic: Parameter 3
-    "4944a106-496f-4353-b73e-436f6d6d6f6e" : {
+    "4944a108-496f-4353-b73e-436f6d6d6f6e" : {
       value: [ adv1Parameters[2] & 0xff,
                (adv1Parameters[2] >> 8) & 0xff,
                (adv1Parameters[2] >> 16) & 0xff,
