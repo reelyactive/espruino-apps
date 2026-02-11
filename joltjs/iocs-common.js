@@ -24,8 +24,8 @@ const IOCS_FILE_NAME = "iocs.json";
 // Global variables
 let isCharacteristicWritePending = false;
 let isAdvertisingUpdatePending = false;
-let burstDurationTimeoutId;
-let burstIntervalTimeoutId;
+let burstDurationTimeoutId = null;
+let burstIntervalTimeoutId = null;
 
 
 // Update isPublicAddress following GATT write
@@ -56,24 +56,21 @@ function updateDeviceName(evt) {
 
 // Update adv1AdvertisingIntervalMilliseconds following GATT write
 function updateAdv1AdvertisingInterval(evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a101"].v = data[0];       // TODO: NRF.setAdvertising()
+  iocs["a101"].v = evt.data;
   isCharacteristicWritePending = true;
   isAdvertisingUpdatePending = true;
 }
 
 // Update adv1BurstDurationMilliseconds following GATT write
 function updateAdv1BurstDuration(evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a102"].v = data[0];       // TODO: setTimeout(), if required
+  iocs["a102"].v = evt.data;
   isCharacteristicWritePending = true;
   isAdvertisingUpdatePending = true;
 }
 
 // Update adv1BurstIntervalMilliseconds following GATT write
 function updateAdv1BurstInterval(evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a103"].v = data[0];       // TODO: setTimeout(), if required
+  iocs["a103"].v = evt.data;
   isCharacteristicWritePending = true;
   isAdvertisingUpdatePending = true;
 }
@@ -94,22 +91,19 @@ function updateAdv1Flags(evt) {
 
 // Update adv1Parameter0 following GATT write
 function updateAdv1Parameter0(index, evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a106"].v = data[0];       // TODO: update parameter
+  iocs["a106"].v = evt.data;      // TODO: update parameter
   isCharacteristicWritePending = true;
 }
 
 // Update adv1Parameter1 following GATT write
 function updateAdv1Parameter1(index, evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a107"].v = data[0];       // TODO: update parameter
+  iocs["a107"].v = evt.data;      // TODO: update parameter
   isCharacteristicWritePending = true;
 }
 
 // Update adv1Parameter2 following GATT write
 function updateAdv1Parameter2(index, evt) {
-  let data = new Uint32Array(evt.data);
-  iocs["a108"].v = data[0];       // TODO: update parameter
+  iocs["a108"].v = evt.data;      // TODO: update parameter
   isCharacteristicWritePending = true;
 }
 
@@ -129,20 +123,24 @@ function handleBurstInterval() {
 function updateAdvertising() {
   let advertisingOptions = {
       name: iocs["1d03"].v,
-      interval: iocs["a101"].v,
+      interval: fromUint32LE(iocs["a101"].v),
       manufacturer: 0x0590,
       manufacturerData: []
   };
   NRF.setAdvertising({}, advertisingOptions);
-  clearTimeout(burstTimeoutId);
-  clearTimeout(burstIntervalId);
+  clearTimeout(burstDurationTimeoutId);
+  clearTimeout(burstIntervalTimeoutId);
 
-  // Burst mode if positive burst duration and longer burst interval
-  let isBurstMode = ((iocs["a102"].v > 0) && (iocs["a103"].v > iocs["a102"].v));
+  let burstDurationMilliseconds = fromUint32LE(iocs["a102"].v);
+  let burstIntervalMilliseconds = fromUint32LE(iocs["a103"].v);
+  let isBurstMode = ((burstDurationMilliseconds > 0) &&
+                     (burstIntervalMilliseconds > burstDurationMilliseconds));
 
   if(isBurstMode) {
-    burstDurationTimeoutId = setTimeout(handleBurstComplete, iocs["a102"].v);
-    burstIntervalTimeoutId = setTimeout(handleBurstInterval, iocs["a103"].v);
+    burstDurationTimeoutId = setTimeout(handleBurstComplete,
+                                        burstDurationMilliseconds);
+    burstIntervalTimeoutId = setTimeout(handleBurstInterval, 
+                                        burstIntervalMilliseconds);
   }
 }
 
@@ -151,6 +149,12 @@ function updateAdvertising() {
 function toUint32LE(number) {
   return [ number & 0xff, (number >> 8) & 0xff, (number >> 16) & 0xff,
            (number >> 24) & 0xff ];
+}
+
+// Convert the given little endian byte array to a 32-bit number
+// TODO: use ArrayBuffer and DataView?
+function fromUint32LE(number) {
+  return (number[3] << 24) + (number[2] << 16) + (number[1] << 8) + number[0];
 }
 
 // Read stored Interoperable Characteristics & Services, or init to defaults
@@ -165,9 +169,12 @@ let iocs = require("Storage").readJSON(IOCS_FILE_NAME, true) || {
     "1d08": { v: process.env.VERSION, r: true, w: false },
     "1d09": { v: process.env.HWVERSION, r: true, w: false },
     "1d0a": { v: DEFAULT_SOFTWARE_REV, r: true, w: false },
-    "a101": { v: toUint32LE(DEFAULT_ADV_INTERVAL_MILLISECONDS), r: true },
-    "a102": { v: toUint32LE(DEFAULT_BURST_DURATION_MILLISECONDS), r: true },
-    "a103": { v: toUint32LE(DEFAULT_BURST_INTERVAL_MILLISECONDS), r: true },
+    "a101": { v: toUint32LE(DEFAULT_ADV_INTERVAL_MILLISECONDS), r: true,
+              w: true },
+    "a102": { v: toUint32LE(DEFAULT_BURST_DURATION_MILLISECONDS), r: true,
+              w: true },
+    "a103": { v: toUint32LE(DEFAULT_BURST_INTERVAL_MILLISECONDS), r: true,
+              w: true },
     "a104": { v: DEFAULT_ADV_TYPE, r: true, w: true },
     "a105": { v: DEFAULT_ADV_FLAGS, r: true, w: true },
     "a106": { v: toUint32LE(DEFAULT_ADV_PARAMETER), r: true, w: true },
