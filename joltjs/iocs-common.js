@@ -23,6 +23,9 @@ const IOCS_FILE_NAME = "iocs.json";
 
 // Global variables
 let isCharacteristicWritePending = false;
+let isAdvertisingUpdatePending = false;
+let burstDurationTimeoutId;
+let burstIntervalTimeoutId;
 
 
 // Update isPublicAddress following GATT write
@@ -48,6 +51,7 @@ function updateDeviceName(evt) {
   data.forEach((char) => { deviceName += String.fromCharCode(char); });
   iocs["1d03"].v = deviceName;    // TODO: NRF.setAdvertising()
   isCharacteristicWritePending = true;
+  isAdvertisingUpdatePending = true;
 }
 
 // Update adv1AdvertisingIntervalMilliseconds following GATT write
@@ -55,6 +59,7 @@ function updateAdv1AdvertisingInterval(evt) {
   let data = new Uint32Array(evt.data);
   iocs["a101"].v = data[0];       // TODO: NRF.setAdvertising()
   isCharacteristicWritePending = true;
+  isAdvertisingUpdatePending = true;
 }
 
 // Update adv1BurstDurationMilliseconds following GATT write
@@ -62,6 +67,7 @@ function updateAdv1BurstDuration(evt) {
   let data = new Uint32Array(evt.data);
   iocs["a102"].v = data[0];       // TODO: setTimeout(), if required
   isCharacteristicWritePending = true;
+  isAdvertisingUpdatePending = true;
 }
 
 // Update adv1BurstIntervalMilliseconds following GATT write
@@ -69,6 +75,7 @@ function updateAdv1BurstInterval(evt) {
   let data = new Uint32Array(evt.data);
   iocs["a103"].v = data[0];       // TODO: setTimeout(), if required
   isCharacteristicWritePending = true;
+  isAdvertisingUpdatePending = true;
 }
 
 // Update adv1Type following GATT write
@@ -104,6 +111,39 @@ function updateAdv1Parameter2(index, evt) {
   let data = new Uint32Array(evt.data);
   iocs["a108"].v = data[0];       // TODO: update parameter
   isCharacteristicWritePending = true;
+}
+
+// Handle the completion of an advertising burst by putting the radio to sleep
+function handleBurstComplete() {
+  NRF.sleep();
+}
+
+// Handle the start of a fresh advertising burst
+function handleBurstInterval() {
+  NRF.wake();
+  // TODO: updating sensor data, etc. could go here
+  updateAdvertising();
+}
+
+// Update the advertising data and burst intervals/timeouts, as required
+function updateAdvertising() {
+  let advertisingOptions = {
+      name: iocs["1d03"].v,
+      interval: iocs["a101"].v,
+      manufacturer: 0x0590,
+      manufacturerData: []
+  };
+  NRF.setAdvertising({}, advertisingOptions);
+  clearTimeout(burstTimeoutId);
+  clearTimeout(burstIntervalId);
+
+  // Burst mode if positive burst duration and longer burst interval
+  let isBurstMode = ((iocs["a102"].v > 0) && (iocs["a103"].v > iocs["a102"].v));
+
+  if(isBurstMode) {
+    burstDurationTimeoutId = setTimeout(handleBurstComplete, iocs["a102"].v);
+    burstIntervalTimeoutId = setTimeout(handleBurstInterval, iocs["a103"].v);
+  }
 }
 
 // Convert the given 32-bit number to a little endian byte array
@@ -176,8 +216,25 @@ function prepareServices(list) {
   return services;
 }
 
-// Set the IoCS Common services and characteristics
+// Write characteristics to storage
+function writeCharacteristics() {
+  let isWriteSuccess = require("Storage").writeJSON(IOCS_FILE_NAME, iocs);
+
+  if(isWriteSuccess) {
+    LED2.set(); // Blink green LED on storage success
+    setTimeout(() => { LED2.reset(); }, LED_BLINK_MILLISECONDS);
+  }
+  else {
+    LED1.set(); // Blink red LED on storage failure
+    setTimeout(() => { LED1.reset(); }, LED_BLINK_MILLISECONDS);
+  }
+
+  return isWriteSuccess;
+}
+
+// Set the IoCS Common services and characteristics and start advertising
 NRF.setServices(prepareServices(iocs));
+updateAdvertising();
 
 // Turn on blue LED upon connection
 NRF.on('connect', (addr) => {
@@ -188,15 +245,10 @@ NRF.on('connect', (addr) => {
 NRF.on('disconnect', (reason) => {
   LED3.reset();
   if(isCharacteristicWritePending) {
-    let isWriteSuccess = require("Storage").writeJSON(IOCS_FILE_NAME, iocs);
-    if(isWriteSuccess) { // Blink green LED on storage success
-      isCharacteristicWritePending = false;
-      LED2.set();
-      setTimeout(() => { LED2.reset() }, LED_BLINK_MILLISECONDS);
-    }
-    else {               // Blink red LED on storage failure
-      LED1.set();
-      setTimeout(() => { LED1.reset() }, LED_BLINK_MILLISECONDS);
-    }
+    isCharacteristicWritePending = !writeCharacteristics();
+  }
+  if(isAdvertisingUpdatePending) {
+    isAdvertisingUpdatePending = false;
+    updateAdvertising();
   }
 });
